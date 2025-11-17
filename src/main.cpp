@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <ZumoShield.h>
+#include <SharpIR.h>
 #include "ZumoChallenge.h"
 
 #define LED 13                  // I/O Yellow LED 
@@ -11,6 +12,8 @@
 #define REVERSE_DURATION  200 // ms
 #define TURN_DURATION     300 // ms
 #define NUM_SENSORS       6
+#define SHARP_IR_PIN      A0
+#define SHARP_MODEL       SharpIR::GP2Y0A41SK0F // SHARP_IR MODEL_GP2D12
 
 // Initialize Zumo
 ZumoBuzzer buzzer;
@@ -18,7 +21,7 @@ ZumoMotors motors;
 Pushbutton button(ZUMO_BUTTON);             // Start Zumo - pushbutton on pin 12
 unsigned int sensor_values[NUM_SENSORS];    // Define # of Sensors or Eyes
 ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN); // Initialize Reflectance Sensors
-
+SharpIR sensor(SHARP_MODEL, SHARP_IR_PIN);
 
 // Push Button
 void waitForButtonAndCountDown(){
@@ -57,34 +60,39 @@ void loop(){
 
   // Read from Reflectance Eye Sensors
   sensors.read(sensor_values);
-  showReflectanceSensor();
 
-  // Check for Button Press (Emergency Stop)
-  if (button.isPressed()){
-    motors.setSpeeds(0, 0);
-    button.waitForRelease();
-    waitForButtonAndCountDown();
-  }
+  int distance = sensor.getDistance(); //Calculate the distance in centimeters and store the value in a variable
+  Serial.println( distance ); //Print the value to the serial monitor
 
-  if (sensor_values[0] > QTR_THRESHOLD){
-    // if leftmost sensor detects line, reverse and turn to the right
-    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-    delay(REVERSE_DURATION);
-    motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
-    delay(TURN_DURATION);
-    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
-  }
-  else if (sensor_values[5] > QTR_THRESHOLD){
-    // if rightmost sensor detects line, reverse and turn to the left
-    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-    delay(REVERSE_DURATION);
-    motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-    delay(TURN_DURATION);
-    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
-  }
-  else{
-    // otherwise, go straight
-    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
-  }
+
+  // showReflectanceSensor();
+
+  // // Check for Button Press (Emergency Stop)
+  // if (button.isPressed()){
+  //   motors.setSpeeds(0, 0);
+  //   button.waitForRelease();
+  //   waitForButtonAndCountDown();
+  // }
+
+  // if (sensor_values[0] > QTR_THRESHOLD){
+  //   // if leftmost sensor detects line, reverse and turn to the right
+  //   motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+  //   delay(REVERSE_DURATION);
+  //   motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
+  //   delay(TURN_DURATION);
+  //   motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+  // }
+  // else if (sensor_values[5] > QTR_THRESHOLD){
+  //   // if rightmost sensor detects line, reverse and turn to the left
+  //   motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+  //   delay(REVERSE_DURATION);
+  //   motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+  //   delay(TURN_DURATION);
+  //   motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+  // }
+  // else{
+  //   // otherwise, go straight
+  //   motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+  // }
 
 }

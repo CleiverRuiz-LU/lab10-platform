@@ -3,16 +3,20 @@
 
 #include <Arduino.h>
 #include <ZumoShield.h>
+#include <SharpIR.h>
 
 // ========== CONSTANTS ==========
-#define LED 13
+#define LED                 13
 #define QTR_THRESHOLD     1500
-#define REVERSE_SPEED     200
-#define TURN_SPEED        200
-#define FORWARD_SPEED     200
-#define REVERSE_DURATION  200
-#define TURN_DURATION     300
-#define NUM_SENSORS       6
+#define REVERSE_SPEED      200
+#define TURN_SPEED         200
+#define FORWARD_SPEED      200
+#define REVERSE_DURATION   200
+#define TURN_DURATION      300
+#define NUM_SENSORS          6
+#define SHARP_IR_PIN        A0
+#define SHARP_MODEL    SharpIR::GP2Y0A41SK0F // SHARP_IR MODEL_GP2D12
+
 
 // ========== EXTERNAL OBJECTS ==========
 extern ZumoBuzzer buzzer;
@@ -22,7 +26,6 @@ extern ZumoReflectanceSensorArray sensors;
 extern unsigned int sensor_values[NUM_SENSORS];
 
 // ========== FUNCTION DECLARATIONS ==========
-
 void RobotInitialize() {
   digitalWrite(LED, HIGH);  
   button.waitForButton();    
